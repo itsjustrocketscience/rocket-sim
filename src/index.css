@@ -1,6 +1,55 @@
+/* src/index.css */
 body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  background-color: #1e1e24; /* Space grey background */
+  background-color: #000000;
+  
+  /* LAYER 1: Dense, moving background stars */
+  background-image: 
+    radial-gradient(white, rgba(255,255,255,.2) 1px, transparent 1px),
+    radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+    radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 2px);
+  /* Smaller background sizes make the stars pack much closer together */
+  background-size: 150px 150px, 250px 250px, 350px 350px;
+  background-position: 0 0, 40px 60px, 130px 270px;
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  overflow-x: hidden;
+  
+  /* The sky slowly drifts */
+  animation: starDrift 100s linear infinite;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+/* --- THE TWINKLING LAYER --- */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  /* A scattered layer of slightly larger, brighter stars */
+  background-image: radial-gradient(#fff, rgba(255,255,255,0.4) 1px, transparent 2px);
+  background-size: 200px 200px;
+  background-position: 75px 75px;
+  pointer-events: none;
+  z-index: -1;
+  /* They pulse in and out of visibility */
+  animation: twinkle 3s ease-in-out infinite alternate;
+}
+
+/* --- CSS ANIMATION KEYFRAMES --- */
+
+/* Panning the base background to simulate orbit rotation */
+@keyframes starDrift {
+  from { background-position: 0 0, 40px 60px, 130px 270px; }
+  to { background-position: -300px -300px, -210px -190px, -220px -80px; }
+}
+
+/* Fading the foreground stars */
+@keyframes twinkle {
+  0% { opacity: 0.1; }
+  100% { opacity: 0.9; }
+}
+

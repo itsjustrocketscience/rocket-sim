@@ -3,7 +3,7 @@ export const missions = [
   {
     id: 1,
     title: "Mission 1: First Ignition",
-    brief: "Welcome to Mission Control, Pilot. Your objective is simple: achieve an apogee of 20km. Environmental conditions are perfectly static, meaning that there are no crosswinds or anything like that. Calculate the required fuel mass using the scratchpad to achieve enough Delta-V. Good luck!",
+    brief: "Welcome to Mission Control, Pilot. Your objective is simple: achieve an apogee of 20km. Environmental conditions are perfectly static, meaning that there are no crosswinds. Calculate the required fuel mass using the scratchpad to achieve enough Delta-V. Good luck!",
     targetApogee: 20, // in km
     payloadMass: 0,   // in kg
     avionicsMass: 0,  // in kg
