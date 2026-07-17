@@ -1,4 +1,5 @@
 // src/App.jsx
+import VabDoors from './components/VabDoors';
 import React, { useState, useEffect } from 'react';
 import { auth } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -21,6 +22,28 @@ function App() {
   
   // --- NAVIGATION STATE ---
   const [activeTab, setActiveTab] = useState('space-center');
+  const [isDoorsClosed, setIsDoorsClosed] = useState(false); // NEW!
+
+  // The Transition Sequence
+  const handleTabChange = (newTabId) => {
+    // Prevent spam-clicking or triggering if already on the tab
+    if (newTabId === activeTab || isDoorsClosed) return;
+
+    // 1. Slam the doors shut
+    setIsDoorsClosed(true);
+
+    // 2. Wait exactly 1 second for the CSS animation to finish
+    setTimeout(() => {
+      // Hot-swap the React UI while the screen is hidden
+      setActiveTab(newTabId);
+
+      // 3. Give React 100ms to render the new room, then open the doors
+      setTimeout(() => {
+        setIsDoorsClosed(false);
+      }, 100);
+      
+    }, 1000); 
+  };
 
   const activeMission = missions[currentMissionIndex];
 
@@ -151,8 +174,11 @@ function App() {
   return (
     <div style={{ fontFamily: '"Space Mono", monospace', backgroundColor: 'transparent', color: '#fff', minHeight: '100vh' }}>
       
-      {/* METEORS ADDED HERE */}
+      {/* METEORS */}
       <Meteor />
+      
+      {/* GLOBAL TRANSITION DOORS ADDED HERE */}
+      <VabDoors isClosed={isDoorsClosed} />
       
       {/* GLOBAL HEADER RESTORED */}
       <header style={{ backgroundColor: '#111', padding: '15px 30px', borderBottom: '2px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -173,7 +199,7 @@ function App() {
             {TABS.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 style={{
                   flex: '1',
                   padding: '15px 20px',
