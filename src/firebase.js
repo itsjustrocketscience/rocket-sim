@@ -4,12 +4,12 @@ import { getAuth } from "firebase/auth";
 
 // REPLACE THIS OBJECT WITH YOUR ACTUAL FIREBASE KEYS
 const firebaseConfig = {
-  apiKey: "AIzaSyB3JaCSaZO53CSlvSZmtgJrJYGB4YoKHuY",
-  authDomain: "rocket-simulator-backend.firebaseapp.com",
-  projectId: "rocket-simulator-backend",
-  storageBucket: "rocket-simulator-backend.firebasestorage.app",
-  messagingSenderId: "840001594174",
-  appId: "1:840001594174:web:f017a8b7a6afae1951826f",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
   measurementId: "G-D4GMFL5J6Z"
 };
 
