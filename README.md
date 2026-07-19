@@ -1,4 +1,5 @@
 # Apogee - Rocket Simulator
+https://github.com/itsjustrocketscience/rocket-sim/blob/main/src/assets/apogee_logo.png
 
 **Link to Access:** [apogee-simulator.vercel.app](https://apogee-simulator.vercel.app/)
 
