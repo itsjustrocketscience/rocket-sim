@@ -1,5 +1,5 @@
 # Apogee - Rocket Simulator
-![Project Screenshot](assets/apogee-logo.png)
+![Project Screenshot](src/assets/apogee_logo.png)
 
 
 **Link to Access:** [apogee-simulator.vercel.app](https://apogee-simulator.vercel.app/)
