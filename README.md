@@ -1,8 +1,9 @@
 # Apogee - Rocket Simulator
 ![Project Screenshot](src/assets/apogee_logo.png)
 
-
 **Link to Access:** [apogee-simulator.vercel.app](https://apogee-simulator.vercel.app/)
+
+*Developed by an aspiring aerospace astronautical engineer*
 
 Apogee is a web-based rocket simulator designed to incorporate real rocket science into a more accessible and fun way. Inspired by Kerbal Space Program, it is meant to be a more simple and intuitive way to grasp concepts such as Delta V, Center of Pressure vs Center of Mass, aerodynamics, etc.
 
@@ -28,11 +29,9 @@ Apogee is a web-based rocket simulator designed to incorporate real rocket scien
 5. Adding logo
 
 ## Other Things
-Pull requests for improving the code are allowed and encouraged! This project is in a WIP unstable alpha phase, so any additional code is very much appreciated.
-
+Pull requests for improving the code are allowed and encouraged! This project is in a WIP unstable alpha phase, so any additional code and feedback is very much appreciated.
 
 ## Running Locally
-
 Want to boot up the simulator on your own machine? 
 
 1. **Clone the repo**
