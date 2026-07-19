@@ -24,7 +24,7 @@ Want to boot up the simulator on your own machine?
 
 1. **Clone the repo**
    ```bash
-   git clone [https://github.com/itsjustrocketscience/rocket-sim.git](https://github.com/itsjustrocketscience/rocket-sim.git)
+   git clone https://github.com/itsjustrocketscience/rocket-sim.git
 2. **Navigate into the directory using cd**
    ```bash
    cd rocket-sim
