@@ -18,6 +18,17 @@ Apogee is a web-based rocket simulator designed to incorporate real rocket scien
 * **Backend:** Google Firebase (Authentication and saving)
 * **Hosting:** Vercel
 
+## Future Planning (WIP)
+1. Switching from 2.5D to 3D STL models (yes, they will also be 3d printable!)
+2. Adding orbital and heavy rockets, along with resizing of parts
+3. Building a dashboard landing page
+4. Adding a sandbox mode and tech tree to enable progression
+5. Adding logo
+
+## Other Things
+Pull requests for improving the code are allowed and encouraged! This project is in a WIP unstable alpha phase, so any additional code is very much appreciated.
+
+
 ## Running Locally
 
 Want to boot up the simulator on your own machine? 
