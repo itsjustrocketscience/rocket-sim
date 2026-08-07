@@ -6,7 +6,8 @@
 *Developed by an aspiring astronautical engineer*
 
 Apogee is a web-based rocket simulator designed to incorporate real rocket science into a more accessible and fun way. Inspired by Kerbal Space Program, it is meant to be a more simple and intuitive way to grasp concepts such as Delta V, Center of Pressure vs Center of Mass, aerodynamics, etc.
-Note that this is not a 100% accurate simulator and should not be treated as one. This is meant to help understand how different parameters affect flight.
+
+*Note that this is not a 100% accurate simulator and should not be treated as one. This is meant to help understand how different parameters affect flight.*
 
 ## Features
 
@@ -14,7 +15,7 @@ Note that this is not a 100% accurate simulator and should not be treated as one
 * **Live Physics Engine:** Calculates Center of Mass, Center of Pressure, and aerodynamic stability while playing.
 * **2.5D Visualizer:** A CSS-based visualizer of the rocket, complete with an exhaust plume and launchpad.
 * **Mission Progression:** A progression system designed to help with introducing rocket science concepts one by one.
-* **Authentication:** All progress is saved in an account, so you can pick up where you left off on *any* device that has a web browser.
+* **Authentication with Account and Guest Mode:** All progress is saved in an account, so you can pick up where you left off on *any* device that has a web browser. There is also a guest mode that saves data locally to the web browser in cache. As soon as an account is created, data syncs so that the account with more progress takes precedence.
 
 ## Stack
 
@@ -23,17 +24,17 @@ Note that this is not a 100% accurate simulator and should not be treated as one
 * **Hosting:** Vercel
 
 ## Future Planning (WIP)
-1. Switching from 2.5D to 3D STL models (yes, they will also be 3d printable!)
-2. Adding orbital and heavy rockets, along with resizing of parts
-3. Building a dashboard landing page
-4. Adding a sandbox mode and tech tree to enable progression
-5. Adding logo
+1. Switching from 2.5D to 3D STL models (yes, they will also be 3d printable!) - TBD
+2. Adding orbital and heavy rockets, along with resizing of parts - TBD
+3. Building a dashboard landing page - ACTIVELY BEING WORKED ON 
+4. Adding a sandbox mode and tech tree to enable progression - TBD
+5. Adding logo - DONE
 
 ## Other Things
-Pull requests for improving the code are allowed and encouraged! This project is in a WIP unstable alpha phase, so any additional code and feedback is very much appreciated.
+Pull requests for improving the code are allowed and encouraged! Any additional code and feedback is very much appreciated.
 
 ## Running Locally
-Want to boot up the simulator on your own machine? 
+Want to run the simulator on your device? 
 
 1. **Clone the repo**
    ```bash
