@@ -1,6 +1,8 @@
+import apogeeLogo from './assets/apogee_logo.png';
 import React, { useState, useEffect } from 'react';
-import { auth } from './firebase';
+import { auth, db } from './firebase'; // 👈 IMPORT DB
 import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore'; // 👈 FIRESTORE TOOLS
 import Auth from './components/Auth';
 import MissionBriefing from './components/MissionBriefing';
 import { missions } from './data/missions';
@@ -11,6 +13,7 @@ import VabDoors from './components/VabDoors';
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(false);
 
   const [currentMissionIndex, setCurrentMissionIndex] = useState(0);
   const [unlockedMissionIndex, setUnlockedMissionIndex] = useState(0);
@@ -21,16 +24,79 @@ function App() {
 
   const activeMission = missions[currentMissionIndex];
 
+  // 1. MASTER AUTH & SYNC LISTENER
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      
+      if (currentUser) {
+        // User logged in! Let's get their cloud data.
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        let cloudProgress = 0;
+        if (userDoc.exists()) {
+          cloudProgress = userDoc.data().unlockedMissionIndex || 0;
+        }
+
+        // Check for any Guest progress they made before logging in
+        const guestProgress = parseInt(localStorage.getItem('apogee_guest_progress')) || 0;
+
+        // THE SYNC: Whoever is higher wins!
+        const highestProgress = Math.max(cloudProgress, guestProgress);
+        setUnlockedMissionIndex(highestProgress);
+
+        // If the guest progress was higher, save it up to the cloud!
+        if (highestProgress > cloudProgress || !userDoc.exists()) {
+          await setDoc(userDocRef, { unlockedMissionIndex: highestProgress }, { merge: true });
+        }
+
+        // Clean up the guest cache so it's fresh for the next person
+        localStorage.removeItem('apogee_guest_progress');
+        setIsGuest(false);
+      }
+      
       setLoading(false);
     });
+    
     return () => unsubscribe();
   }, []);
 
+  // 2. GUEST MODE STARTUP
+  useEffect(() => {
+    if (isGuest && !user) {
+      const savedProgress = parseInt(localStorage.getItem('apogee_guest_progress')) || 0;
+      setUnlockedMissionIndex(savedProgress);
+    }
+  }, [isGuest, user]);
+
+  // 3. MASTER SAVE FUNCTION (Handles both Guest Cache & Cloud)
+  const handleMissionSuccess = async () => {
+    if (currentMissionIndex === unlockedMissionIndex) {
+      const newIndex = unlockedMissionIndex + 1;
+      setUnlockedMissionIndex(newIndex); // Update UI instantly
+
+      if (user) {
+        // Push to Cloud
+        const userDocRef = doc(db, 'users', user.uid);
+        await setDoc(userDocRef, { unlockedMissionIndex: newIndex }, { merge: true });
+      } else if (isGuest) {
+        // Push to Cache
+        localStorage.setItem('apogee_guest_progress', newIndex.toString());
+      }
+    }
+  };
+
   const handleLogout = async () => {
-    await signOut(auth);
+    if (isGuest) {
+      setIsGuest(false);
+      setCurrentMissionIndex(0);
+      setActiveTab('space-center');
+    } else {
+      await signOut(auth);
+      setCurrentMissionIndex(0);
+      setActiveTab('space-center');
+    }
   };
 
   const handleTabChange = (newTabId) => {
@@ -59,7 +125,14 @@ function App() {
         return (
           <div>
             <h2>Space Center Hub</h2>
-            <p style={{ color: '#aaa' }}>Welcome back, Director {user?.email}. Agency overview coming soon.</p>
+            <p style={{ color: '#aaa' }}>
+              Welcome back, {isGuest ? 'Guest Director' : `Director ${user?.email}`}. Agency overview coming soon.
+            </p>
+            {isGuest && (
+              <div style={{ backgroundColor: 'rgba(255, 193, 7, 0.1)', border: '1px solid #ffc107', padding: '15px', borderRadius: '4px', marginTop: '20px', color: '#ffc107', display: 'inline-block' }}>
+                ⚠️ <strong>GUEST MODE ACTIVE:</strong> Your progress is saved locally. If you create an account, your progress will automatically sync to the cloud!
+              </div>
+            )}
           </div>
         );
       case 'mission-control':
@@ -105,32 +178,51 @@ function App() {
         <ActiveMission 
           activeMission={activeMission} 
           exitMission={() => setIsMissionActive(false)} 
-          onMissionSuccess={() => {
-            if (currentMissionIndex === unlockedMissionIndex) {
-              setUnlockedMissionIndex(prev => prev + 1);
-            }
-          }}
+          onMissionSuccess={handleMissionSuccess} // 👈 USING THE NEW MASTER SAVE FUNCTION
         />
       </div>
     );
   }
+
+  const isAuthorized = user || isGuest;
 
   return (
     <div style={{ fontFamily: '"Space Mono", monospace', backgroundColor: 'transparent', color: '#fff', minHeight: '100vh' }}>
       <Meteor />
       <VabDoors isClosed={isDoorsClosed} />
       
-      <header style={{ backgroundColor: '#111', padding: '15px 30px', borderBottom: '2px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ margin: 0, color: '#4da8da', fontSize: '1.5rem' }}>🚀 Command Subsystem</h1>
-        {user && (
+      <header style={{ backgroundColor: '#111', padding: '20px 40px', borderBottom: '2px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <img src={apogeeLogo} alt="Apogee Logo" style={{ height: '35px' }} />
+          <h1 style={{ margin: 0, color: '#4da8da', fontSize: '1.5rem', letterSpacing: '3px' }}>CONTROL CENTER</h1>
+        </div>
+        {isAuthorized && (
           <button onClick={handleLogout} style={{ padding: '8px 16px', backgroundColor: '#ff4d4d', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontFamily: '"Space Mono", monospace' }}>
-            Abort (Logout)
+            Abort ({isGuest ? 'Guest Mode' : 'Logout'})
           </button>
         )}
       </header>
 
-      {!user ? (
-        <main style={{ padding: '40px' }}><Auth /></main>
+      {!isAuthorized ? (
+        <main style={{ padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '8vh', gap: '30px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+            <img src={apogeeLogo} alt="Apogee Logo" style={{ height: '120px', filter: 'drop-shadow(0 0 25px rgba(77, 168, 218, 0.6))' }} />
+          </div>
+          
+          <Auth />
+          
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px', marginTop: '10px' }}>
+            <span style={{ color: '#666', fontSize: '0.9rem' }}>--------- OR ---------</span>
+            <button 
+              onClick={() => setIsGuest(true)} 
+              style={{ padding: '12px 30px', backgroundColor: 'transparent', color: '#4da8da', border: '2px solid #4da8da', borderRadius: '4px', cursor: 'pointer', fontFamily: '"Space Mono", monospace', fontSize: '1.1rem', fontWeight: 'bold', transition: 'all 0.2s ease', boxShadow: '0 0 10px rgba(77, 168, 218, 0.2)' }}
+              onMouseOver={(e) => { e.target.style.backgroundColor = 'rgba(77, 168, 218, 0.1)'; }}
+              onMouseOut={(e) => { e.target.style.backgroundColor = 'transparent'; }}
+            >
+              🚀 INITIATE GUEST SEQUENCE
+            </button>
+          </div>
+        </main>
       ) : (
         <div>
           <nav style={{ display: 'flex', backgroundColor: '#1a1a20', borderBottom: '1px solid #444', overflowX: 'auto' }}>
