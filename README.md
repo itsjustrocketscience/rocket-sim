@@ -3,9 +3,10 @@
 
 **Link to Access:** [apogee-simulator.vercel.app](https://apogee-simulator.vercel.app/)
 
-*Developed by an aspiring aerospace astronautical engineer*
+*Developed by an aspiring astronautical engineer*
 
 Apogee is a web-based rocket simulator designed to incorporate real rocket science into a more accessible and fun way. Inspired by Kerbal Space Program, it is meant to be a more simple and intuitive way to grasp concepts such as Delta V, Center of Pressure vs Center of Mass, aerodynamics, etc.
+Note that this is not a 100% accurate simulator and should not be treated as one. This is meant to help understand how different parameters affect flight.
 
 ## Features
 
