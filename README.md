@@ -26,8 +26,8 @@ Apogee is a web-based rocket simulator designed to incorporate real rocket scien
 ## Future Planning (WIP)
 1. Switching from 2.5D to 3D STL models (yes, they will also be 3d printable!) - TBD
 2. Adding orbital and heavy rockets, along with resizing of parts - TBD
-3. Building a dashboard landing page - ACTIVELY BEING WORKED ON 
-4. Adding a sandbox mode and tech tree to enable progression - TBD
+3. Building a dashboard landing page - DONE
+4. Adding a sandbox mode and tech tree to enable progression - WORKING ON IT
 5. Adding logo - DONE
 
 ## Other Things
