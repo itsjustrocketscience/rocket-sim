@@ -1,14 +1,21 @@
 import apogeeLogo from './assets/apogee_logo.png';
 import React, { useState, useEffect } from 'react';
-import { auth, db } from './firebase'; // 👈 IMPORT DB
+import { auth, db } from './firebase'; 
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore'; // 👈 FIRESTORE TOOLS
+import { doc, getDoc, setDoc } from 'firebase/firestore'; 
 import Auth from './components/Auth';
 import MissionBriefing from './components/MissionBriefing';
 import { missions } from './data/missions';
 import ActiveMission from './components/ActiveMission';
 import Meteor from './components/Meteor';
 import VabDoors from './components/VabDoors';
+import ResearchAndDevelopment from './components/ResearchAndDevelopment';
+import Sandbox from './components/Sandbox';
+
+// NEW COMPONENTS
+import SpaceCenter from './components/SpaceCenter';
+import FlightManual from './components/FlightManual';
+import Feedback from './components/Feedback';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -30,7 +37,6 @@ function App() {
       setUser(currentUser);
       
       if (currentUser) {
-        // User logged in! Let's get their cloud data.
         const userDocRef = doc(db, 'users', currentUser.uid);
         const userDoc = await getDoc(userDocRef);
         
@@ -39,19 +45,14 @@ function App() {
           cloudProgress = userDoc.data().unlockedMissionIndex || 0;
         }
 
-        // Check for any Guest progress they made before logging in
         const guestProgress = parseInt(localStorage.getItem('apogee_guest_progress')) || 0;
-
-        // THE SYNC: Whoever is higher wins!
         const highestProgress = Math.max(cloudProgress, guestProgress);
         setUnlockedMissionIndex(highestProgress);
 
-        // If the guest progress was higher, save it up to the cloud!
         if (highestProgress > cloudProgress || !userDoc.exists()) {
           await setDoc(userDocRef, { unlockedMissionIndex: highestProgress }, { merge: true });
         }
 
-        // Clean up the guest cache so it's fresh for the next person
         localStorage.removeItem('apogee_guest_progress');
         setIsGuest(false);
       }
@@ -70,18 +71,16 @@ function App() {
     }
   }, [isGuest, user]);
 
-  // 3. MASTER SAVE FUNCTION (Handles both Guest Cache & Cloud)
+  // 3. MASTER SAVE FUNCTION 
   const handleMissionSuccess = async () => {
     if (currentMissionIndex === unlockedMissionIndex) {
       const newIndex = unlockedMissionIndex + 1;
-      setUnlockedMissionIndex(newIndex); // Update UI instantly
+      setUnlockedMissionIndex(newIndex); 
 
       if (user) {
-        // Push to Cloud
         const userDocRef = doc(db, 'users', user.uid);
         await setDoc(userDocRef, { unlockedMissionIndex: newIndex }, { merge: true });
       } else if (isGuest) {
-        // Push to Cache
         localStorage.setItem('apogee_guest_progress', newIndex.toString());
       }
     }
@@ -113,7 +112,7 @@ function App() {
   const TABS = [
     { id: 'space-center', label: '1. Space Center' },
     { id: 'mission-control', label: '2. Mission Control' },
-    { id: 'vab', label: '3. Vehicle Assembly' },
+    { id: 'sandbox', label: '3. Sandbox Mode' },
     { id: 'rnd', label: '4. R&D' },
     { id: 'flight-manual', label: '5. Flight Manual' },
     { id: 'feedback', label: '6. Feedback' }
@@ -122,19 +121,7 @@ function App() {
   const renderActiveView = () => {
     switch (activeTab) {
       case 'space-center':
-        return (
-          <div>
-            <h2>Space Center Hub</h2>
-            <p style={{ color: '#aaa' }}>
-              Welcome back, {isGuest ? 'Guest Director' : `Director ${user?.email}`}. Agency overview coming soon.
-            </p>
-            {isGuest && (
-              <div style={{ backgroundColor: 'rgba(255, 193, 7, 0.1)', border: '1px solid #ffc107', padding: '15px', borderRadius: '4px', marginTop: '20px', color: '#ffc107', display: 'inline-block' }}>
-                ⚠️ <strong>GUEST MODE ACTIVE:</strong> Your progress is saved locally. If you create an account, your progress will automatically sync to the cloud!
-              </div>
-            )}
-          </div>
-        );
+        return <SpaceCenter user={user} isGuest={isGuest} unlockedMissionIndex={unlockedMissionIndex} />;
       case 'mission-control':
         return (
           <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-start' }}>
@@ -161,10 +148,12 @@ function App() {
             </div>
           </div>
         );
-      case 'vab': return <h2>Vehicle Assembly Building (Sandbox Mode Offline)</h2>;
-      case 'rnd': return <h2>Research & Development (Tech Tree Offline)</h2>;
-      case 'flight-manual': return <h2>Flight Manual (Training Archives Offline)</h2>;
-      case 'feedback': return <h2>Engineering Feedback Channel</h2>;
+      case 'sandbox': 
+        return <Sandbox exitSandbox={() => setActiveTab('space-center')} />;
+      case 'rnd': 
+        return <ResearchAndDevelopment unlockedMissionIndex={unlockedMissionIndex} />;
+      case 'flight-manual': return <FlightManual />;
+      case 'feedback': return <Feedback />;
       default: return <h2>404 - Sector Not Found</h2>;
     }
   };
@@ -178,7 +167,7 @@ function App() {
         <ActiveMission 
           activeMission={activeMission} 
           exitMission={() => setIsMissionActive(false)} 
-          onMissionSuccess={handleMissionSuccess} // 👈 USING THE NEW MASTER SAVE FUNCTION
+          onMissionSuccess={handleMissionSuccess} 
         />
       </div>
     );
@@ -191,7 +180,7 @@ function App() {
       <Meteor />
       <VabDoors isClosed={isDoorsClosed} />
       
-      <header style={{ backgroundColor: '#111', padding: '20px 40px', borderBottom: '2px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <header style={{ backgroundColor: '#111', padding: '15px 30px', borderBottom: '2px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           <img src={apogeeLogo} alt="Apogee Logo" style={{ height: '35px' }} />
           <h1 style={{ margin: 0, color: '#4da8da', fontSize: '1.5rem', letterSpacing: '3px' }}>CONTROL CENTER</h1>
@@ -205,8 +194,8 @@ function App() {
 
       {!isAuthorized ? (
         <main style={{ padding: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '8vh', gap: '30px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-            <img src={apogeeLogo} alt="Apogee Logo" style={{ height: '120px', filter: 'drop-shadow(0 0 25px rgba(77, 168, 218, 0.6))' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '10px' }}>
+            <img src={apogeeLogo} alt="Apogee Logo" style={{ height: '160px', filter: 'drop-shadow(0 0 25px rgba(77, 168, 218, 0.6))' }} />
           </div>
           
           <Auth />
